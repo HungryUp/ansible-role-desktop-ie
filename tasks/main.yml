@@ -1,2 +1,32 @@
 ---
-# tasks file for HungryUp.desktop-ie
+- name: "Install from homebrew"
+  homebrew:
+    name:
+      - wine
+      - winetricks
+    state: present
+
+- name: "Install from homebrew cask"
+  homebrew_cask:
+    name:
+      - xquartz
+    state: present
+
+- name: Creates directories
+  file: path=/Users/{{ lookup('env','USER') }}/.wine/prefixes/{{item}} state=directory
+  with_items:
+    - ie6
+    - ie7
+    - ie8
+
+- name: Run winetricks
+  command: winetricks {{item}}
+  environment:
+    WINEPREFIX: /Users/{{ lookup('env','USER') }}/.wine/prefixes/{{item}}
+    WINEARCH: win32
+  args:
+    creates: /Users/{{ lookup('env','USER') }}/.wine/prefixes/{{item}}/system.reg
+  with_items:
+    - ie6
+    - ie7
+    - ie8
